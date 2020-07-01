@@ -10,7 +10,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/AlchemicalHydra" />
+            <option value="$PROJECT_DIR$/alchemicalhydra" />
             <option value="$PROJECT_DIR$/buildSrc" />
           </set>
         </option>
