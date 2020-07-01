@@ -40,6 +40,7 @@ import net.runelite.api.Sprite;
 import net.runelite.api.SpriteID;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ComponentOrientation;
 import net.runelite.client.ui.overlay.components.InfoBoxComponent;
@@ -47,11 +48,12 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.util.ImageUtil;
 
 @Singleton
-class HydraOverlay extends Overlay
+class AlchemicalHydraOverlay extends Overlay
 {
 	static final int IMGSIZE = 36;
 
-	private final HydraPlugin plugin;
+	private final AlchemicalHydraPlugin plugin;
+	private final AlchemicalHydraConfig config;
 	private final Client client;
 	private final SpriteManager spriteManager;
 	private final PanelComponent panelComponent = new PanelComponent();
@@ -59,31 +61,24 @@ class HydraOverlay extends Overlay
 	private BufferedImage stunImg;
 
 	@Setter(AccessLevel.PACKAGE)
-	private Color safeCol;
-
-	@Setter(AccessLevel.PACKAGE)
-	private Color medCol;
-
-	@Setter(AccessLevel.PACKAGE)
-	private Color badCol;
-
-	@Setter(AccessLevel.PACKAGE)
 	private int stunTicks;
 
 	@Inject
-	HydraOverlay(final HydraPlugin plugin, final Client client, final SpriteManager spriteManager)
+	AlchemicalHydraOverlay(final AlchemicalHydraPlugin plugin, final AlchemicalHydraConfig config, final Client client, final SpriteManager spriteManager)
 	{
 		this.plugin = plugin;
+		this.config = config;
 		this.client = client;
 		this.spriteManager = spriteManager;
 		this.setPosition(OverlayPosition.BOTTOM_RIGHT);
+		determineLayer();
 		panelComponent.setOrientation(ComponentOrientation.VERTICAL);
 	}
 
 	@Override
 	public Dimension render(Graphics2D graphics2D)
 	{
-		final Hydra hydra = plugin.getHydra();
+		final AlchemicalHydra hydra = plugin.getHydra();
 		panelComponent.getChildren().clear();
 
 		if (hydra == null)
@@ -98,7 +93,7 @@ class HydraOverlay extends Overlay
 		}
 
 
-		if (plugin.isCounting())
+		if (config.counting())
 		{
 			// Add spec box second, to keep it above pray
 			addSpecOverlay(hydra);
@@ -117,7 +112,7 @@ class HydraOverlay extends Overlay
 	{
 		final InfoBoxComponent stunComponent = new InfoBoxComponent();
 
-		stunComponent.setBackgroundColor(badCol);
+		stunComponent.setBackgroundColor(config.badCol());
 		stunComponent.setImage(getStunImg());
 		stunComponent.setText("        " + stunTicks);
 		stunComponent.setPreferredSize(new Dimension(40, 40));
@@ -125,12 +120,12 @@ class HydraOverlay extends Overlay
 		panelComponent.getChildren().add(stunComponent);
 	}
 
-	private void addSpecOverlay(final Hydra hydra)
+	private void addSpecOverlay(final AlchemicalHydra hydra)
 	{
-		final HydraPhase phase = hydra.getPhase();
+		final AlchemicalHydraPhase phase = hydra.getPhase();
 		final int nextSpec = hydra.getNextSpecialRelative();
 
-		if (nextSpec > 3)
+		if (nextSpec > 3 || nextSpec < 0)
 		{
 			return;
 		}
@@ -138,11 +133,11 @@ class HydraOverlay extends Overlay
 
 		if (nextSpec == 0)
 		{
-			specComponent.setBackgroundColor(badCol);
+			specComponent.setBackgroundColor(config.badCol());
 		}
 		else if (nextSpec == 1)
 		{
-			specComponent.setBackgroundColor(medCol);
+			specComponent.setBackgroundColor(config.medCol());
 		}
 
 		specComponent.setImage(phase.getSpecImage(spriteManager));
@@ -152,7 +147,7 @@ class HydraOverlay extends Overlay
 		panelComponent.getChildren().add(specComponent);
 	}
 
-	private void addPrayOverlay(final Hydra hydra)
+	private void addPrayOverlay(final AlchemicalHydra hydra)
 	{
 		final Prayer nextPrayer = hydra.getNextAttack().getPrayer();
 		final int nextSwitch = hydra.getNextSwitch();
@@ -161,11 +156,11 @@ class HydraOverlay extends Overlay
 
 		if (nextSwitch == 1)
 		{
-			prayComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? medCol : badCol);
+			prayComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.medCol() : config.badCol());
 		}
 		else
 		{
-			prayComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? safeCol : badCol);
+			prayComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.safeCol() : config.badCol());
 		}
 
 		prayComponent.setImage(hydra.getNextAttack().getImage(spriteManager));
@@ -221,5 +216,13 @@ class HydraOverlay extends Overlay
 		}
 
 		return sprites[0];
+	}
+
+	public void determineLayer()
+	{
+		if (config.mirrorMode())
+		{
+			setLayer(OverlayLayer.AFTER_MIRROR);
+		}
 	}
 }

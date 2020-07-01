@@ -1,8 +1,8 @@
-# Lapask Plugins
-External plugins for use with OpenOSRS, this is a seperate entity, not OpenOSRS.
+![xKylee - CI (Push)](https://github.com/xKylee/plugins-source/workflows/xKylee%20-%20CI%20(Push)/badge.svg?branch=master)
 
-Add this repo to your external plugins manager by clicking the top right + button.
-Make sure it looks like this picture below.
+# Lapask Test.
 
-## Plugins
-*AlchemHydra*
+This is a test to learn how to code plugins
+
+# Discord
+https://discord.gg/sJKh2g

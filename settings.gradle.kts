@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "Lap Plugins"
+rootProject.name = "Lapask"
 
 include(":alchemicalhydra")
 
