@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Plugin-Version: 0.0.9
-Plugin-Id: alchemicalhydra-plugin
-Plugin-Provider: Lapask
-Plugin-Description: Show what to pray against Alchemical Hydra
-Plugin-License: GNU General Public License v3.0
-
